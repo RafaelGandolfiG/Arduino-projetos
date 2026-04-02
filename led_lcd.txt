@@ -1,0 +1,47 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+int botao1 = 7;
+int botao2 = 8;
+int led = 6;
+
+void setup() {
+  pinMode(botao1, INPUT_PULLUP);
+  pinMode(botao2, INPUT_PULLUP);
+  pinMode(led, OUTPUT);
+
+  lcd.begin(16, 2);
+  lcd.print("Aguardando...");
+}
+
+void loop() {
+
+  if (digitalRead(botao1) == LOW) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Piscando...");
+
+    while (true) {
+      if (digitalRead(botao2) == LOW) {
+        break;
+      }
+
+      digitalWrite(led, HIGH);
+      delay(300);
+
+      // verifica de novo antes de desligar
+      if (digitalRead(botao2) == LOW) {
+        break;
+      }
+
+      digitalWrite(led, LOW);
+      delay(300);
+    }
+
+    lcd.clear();
+    lcd.print("Aguardando...");
+    digitalWrite(led, LOW);
+    delay(300);
+  }
+}
