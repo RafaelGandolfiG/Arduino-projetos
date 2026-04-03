@@ -1,0 +1,111 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+int trig = 9;
+int echo = 10;
+
+int vermelho = 8;
+int amarelo = 7;
+int verde = 6;
+
+void setup() {
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+
+  pinMode(vermelho, OUTPUT);
+  pinMode(amarelo, OUTPUT);
+  pinMode(verde, OUTPUT);
+
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Distancia");
+}
+
+void loop() {
+  long duracao;
+  float distancia;
+
+  // Envia pulso
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  // Recebe o pulso
+  duracao = pulseIn(echo, HIGH);
+
+  // Calcula distância (cm)
+  distancia = duracao * 0.034 / 2;
+
+  // Mostra no LCD
+  lcd.setCursor(0, 1);
+  lcd.print("                ");
+  lcd.setCursor(0, 1);
+  lcd.print(distancia);
+  lcd.print(" cm");
+
+  // 🚦 Se estiver a 15 cm ou menos → ativa semáforo
+  if (distancia <= 15) {
+
+    while (distancia <= 15) {
+
+      // 🔴 Vermelho
+      digitalWrite(vermelho, HIGH);
+      digitalWrite(amarelo, LOW);
+      digitalWrite(verde, LOW);
+      delay(3000);
+
+      // mede de novo
+      digitalWrite(trig, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig, LOW);
+      duracao = pulseIn(echo, HIGH);
+      distancia = duracao * 0.034 / 2;
+
+      if (distancia > 15) break;
+
+      // 🟢 Verde
+      digitalWrite(vermelho, LOW);
+      digitalWrite(amarelo, LOW);
+      digitalWrite(verde, HIGH);
+      delay(3000);
+
+      // mede de novo
+      digitalWrite(trig, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig, LOW);
+      duracao = pulseIn(echo, HIGH);
+      distancia = duracao * 0.034 / 2;
+
+      if (distancia > 15) break;
+
+      // 🟡 Amarelo
+      digitalWrite(vermelho, LOW);
+      digitalWrite(amarelo, HIGH);
+      digitalWrite(verde, LOW);
+      delay(1000);
+
+      // mede de novo
+      digitalWrite(trig, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig, LOW);
+      duracao = pulseIn(echo, HIGH);
+      distancia = duracao * 0.034 / 2;
+    }
+
+    // desliga tudo ao sair
+    digitalWrite(vermelho, LOW);
+    digitalWrite(amarelo, LOW);
+    digitalWrite(verde, LOW);
+  }
+
+  delay(200);
+}
